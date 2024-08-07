@@ -114,6 +114,32 @@ See https://www.w3.org/TR/webdriver1/#find-elements ."
               collect (make-instance 'element :id id)))
     (protocol-error (err) (handle-find-error err :value value :by by))))
 
+(defun find-element-from-element (element-id value &key (by :css-selector) (session *session*))
+  "Find an element that matches VALUE using location strategy in BY with a start node of ELEMENT-ID.
+
+Category: Elements
+See FIND-ELEMENT.
+See https://www.w3.org/TR/webdriver1/#find-element-from-element ."
+  (handler-case
+      (let ((response (http-post (session-path session "/element/~a/element" element-id)
+                                 :value value :using (by by))))
+        (make-instance 'element
+                       :id (cdadr (assoc :value response))))
+    (protocol-error (err) (handle-find-error err :value value :by by))))
+
+(defun find-elements-from-element (element-id value &key (by :css-selector) (session *session*))
+  "Find elements that match VALUE using location strategy in BY with a start node of ELEMENT-ID.
+
+Category: Elements
+See FIND-ELEMENTS.
+See https://www.w3.org/TR/webdriver1/#find-elements-from-element ."
+  (handler-case
+      (let ((response (http-post (session-path session "/element/~a/elements" element-id)
+                                 :value value :using (by by))))
+        (loop for ((nil . id)) in (cdr (assoc :value response))
+              collect (make-instance 'element :id id)))
+    (protocol-error (err) (handle-find-error err :value value :by by))))
+
 (deftype element-location-strategy ()
   "An element location strategy is an enumerated attribute deciding what technique should be used to search for elements in the current browsing context.
 See: https://www.w3.org/TR/webdriver1/#dfn-strategy ."

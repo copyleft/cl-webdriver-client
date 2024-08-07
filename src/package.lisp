@@ -30,6 +30,8 @@
 
            #:find-element
            #:find-elements
+           #:find-element-from-element
+           #:find-elements-from-element
            #:active-element
            #:element-clear
            #:element-click
